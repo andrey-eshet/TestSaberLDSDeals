@@ -1,0 +1,71 @@
+name: hourly-closed-packages
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run-monitoring:
+    runs-on: ubuntu-latest
+
+    env:
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      MAIL_TO: ${{ secrets.MAIL_TO }}
+      MAIL_CC: ${{ secrets.MAIL_CC }}
+      SCHEDULE_TZ: ${{ vars.SCHEDULE_TZ }}
+      SCHEDULE_DAYS: ${{ vars.SCHEDULE_DAYS }}
+      SCHEDULE_START: ${{ vars.SCHEDULE_START }}
+      SCHEDULE_END: ${{ vars.SCHEDULE_END }}
+      RUN_OUTSIDE_SCHEDULE: ${{ vars.RUN_OUTSIDE_SCHEDULE }}
+      HEADLESS: "true"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Allure CLI
+        run: npm install -g allure-commandline
+
+      - name: Install Playwright browser
+        run: python -m playwright install --with-deps chromium
+
+      - name: Run CI script
+        run: python scripts/run_ci.py
+
+      - name: Upload Allure ZIP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-zip
+          path: artifacts/allure-report.zip
+          if-no-files-found: ignore
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+          if-no-files-found: ignore
+
+      - name: Upload summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: summary-json
+          path: artifacts/summary.json
+          if-no-files-found: ignore

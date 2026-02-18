@@ -1,0 +1,181 @@
+<!DOCTYPE html><html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - TourGw</title>
+
+    
+    
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T">
+<meta name="x-stylesheet-fallback-test" content="" class="sr-only"><script>!function(a,b,c,d){var e,f=document,g=f.getElementsByTagName("SCRIPT"),h=g[g.length-1].previousElementSibling,i=f.defaultView&&f.defaultView.getComputedStyle?f.defaultView.getComputedStyle(h):h.currentStyle;if(i&&i[a]!==b)for(e=0;e<c.length;e++)f.write('<link href="'+c[e]+'" '+d+"/>")}("position","absolute",["/lib/bootstrap/dist/css/bootstrap.min.css"], "rel=\u0022stylesheet\u0022 crossorigin=\u0022anonymous\u0022 integrity=\u0022sha384-ggOyR0iXCbMQv3Xipma34MD\u002BdH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T\u0022 ");</script>
+    
+    <link rel="stylesheet" href="/css/site.css">
+    <script type="text/javascript">!function(T,l,y){var S=T.location,k="script",D="instrumentationKey",C="ingestionendpoint",I="disableExceptionTracking",E="ai.device.",b="toLowerCase",w="crossOrigin",N="POST",e="appInsightsSDK",t=y.name||"appInsights";(y.name||T[e])&&(T[e]=t);var n=T[t]||function(d){var g=!1,f=!1,m={initialize:!0,queue:[],sv:"5",version:2,config:d};function v(e,t){var n={},a="Browser";return n[E+"id"]=a[b](),n[E+"type"]=a,n["ai.operation.name"]=S&&S.pathname||"_unknown_",n["ai.internal.sdkVersion"]="javascript:snippet_"+(m.sv||m.version),{time:function(){var e=new Date;function t(e){var t=""+e;return 1===t.length&&(t="0"+t),t}return e.getUTCFullYear()+"-"+t(1+e.getUTCMonth())+"-"+t(e.getUTCDate())+"T"+t(e.getUTCHours())+":"+t(e.getUTCMinutes())+":"+t(e.getUTCSeconds())+"."+((e.getUTCMilliseconds()/1e3).toFixed(3)+"").slice(2,5)+"Z"}(),iKey:e,name:"Microsoft.ApplicationInsights."+e.replace(/-/g,"")+"."+t,sampleRate:100,tags:n,data:{baseData:{ver:2}}}}var h=d.url||y.src;if(h){function a(e){var t,n,a,i,r,o,s,c,u,p,l;g=!0,m.queue=[],f||(f=!0,t=h,s=function(){var e={},t=d.connectionString;if(t)for(var n=t.split(";"),a=0;a<n.length;a++){var i=n[a].split("=");2===i.length&&(e[i[0][b]()]=i[1])}if(!e[C]){var r=e.endpointsuffix,o=r?e.location:null;e[C]="https://"+(o?o+".":"")+"dc."+(r||"services.visualstudio.com")}return e}(),c=s[D]||d[D]||"",u=s[C],p=u?u+"/v2/track":d.endpointUrl,(l=[]).push((n="SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details)",a=t,i=p,(o=(r=v(c,"Exception")).data).baseType="ExceptionData",o.baseData.exceptions=[{typeName:"SDKLoadFailed",message:n.replace(/\./g,"-"),hasFullStack:!1,stack:n+"\nSnippet failed to load ["+a+"] -- Telemetry is disabled\nHelp Link: https://go.microsoft.com/fwlink/?linkid=2128109\nHost: "+(S&&S.pathname||"_unknown_")+"\nEndpoint: "+i,parsedStack:[]}],r)),l.push(function(e,t,n,a){var i=v(c,"Message"),r=i.data;r.baseType="MessageData";var o=r.baseData;return o.message='AI (Internal): 99 message:"'+("SDK LOAD Failure: Failed to load Application Insights SDK script (See stack for details) ("+n+")").replace(/\"/g,"")+'"',o.properties={endpoint:a},i}(0,0,t,p)),function(e,t){if(JSON){var n=T.fetch;if(n&&!y.useXhr)n(t,{method:N,body:JSON.stringify(e),mode:"cors"});else if(XMLHttpRequest){var a=new XMLHttpRequest;a.open(N,t),a.setRequestHeader("Content-type","application/json"),a.send(JSON.stringify(e))}}}(l,p))}function i(e,t){f||setTimeout(function(){!t&&m.core||a()},500)}var e=function(){var n=l.createElement(k);n.src=h;var e=y[w];return!e&&""!==e||"undefined"==n[w]||(n[w]=e),n.onload=i,n.onerror=a,n.onreadystatechange=function(e,t){"loaded"!==n.readyState&&"complete"!==n.readyState||i(0,t)},n}();y.ld<0?l.getElementsByTagName("head")[0].appendChild(e):setTimeout(function(){l.getElementsByTagName(k)[0].parentNode.appendChild(e)},y.ld||0)}try{m.cookie=l.cookie}catch(p){}function t(e){for(;e.length;)!function(t){m[t]=function(){var e=arguments;g||m.queue.push(function(){m[t].apply(m,e)})}}(e.pop())}var n="track",r="TrackPage",o="TrackEvent";t([n+"Event",n+"PageView",n+"Exception",n+"Trace",n+"DependencyData",n+"Metric",n+"PageViewPerformance","start"+r,"stop"+r,"start"+o,"stop"+o,"addTelemetryInitializer","setAuthenticatedUserContext","clearAuthenticatedUserContext","flush"]),m.SeverityLevel={Verbose:0,Information:1,Warning:2,Error:3,Critical:4};var s=(d.extensionConfig||{}).ApplicationInsightsAnalytics||{};if(!0!==d[I]&&!0!==s[I]){var c="onerror";t(["_"+c]);var u=T[c];T[c]=function(e,t,n,a,i){var r=u&&u(e,t,n,a,i);return!0!==r&&m["_"+c]({message:e,url:t,lineNumber:n,columnNumber:a,error:i}),r},d.autoExceptionInstrumented=!0}return m}(y.cfg);function a(){y.onInit&&y.onInit(n)}(T[t]=n).queue&&0===n.queue.length?(n.queue.push(a),n.trackPageView({})):a()}(window,document,{
+src: "https://js.monitor.azure.com/scripts/b/ai.2.min.js", // The SDK URL Source
+crossOrigin: "anonymous", 
+cfg: { // Application Insights Configuration
+    connectionString: 'InstrumentationKey=fc5fd52a-5253-4218-b586-9f16980261d7;IngestionEndpoint=https://northeurope-2.in.applicationinsights.azure.com/'
+}});</script>
+<script src="https://js.monitor.azure.com/scripts/b/ai.2.min.js" crossorigin="anonymous"></script></head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" href="/">TourGw</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarItinerary" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Itinerary</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarItinerary">
+                                <a class="dropdown-item" href="/Itinerary/AutoComplete">AutoComplete</a>
+                                <a class="dropdown-item" href="/Itinerary/GetGuidesCodesAndNames">Get Guides Codes And Names</a>
+                                <a class="dropdown-item" href="/Itinerary/Search">Search</a>
+                                <a class="dropdown-item" href="/Itinerary/Product">Product</a>
+                                <a class="dropdown-item" href="/Itinerary/GetDeparturePricing">Get Departure Pricing</a>
+                                <a class="dropdown-item" href="/Itinerary/StaticItinerary">Static Itinerary</a>
+                                <a class="dropdown-item" href="/Itinerary/CountryVisa">Country Visa</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDeals" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Deals</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDeals">
+                                <a class="dropdown-item" href="/Deals/ActiveDestinations">Active Destinations</a>
+                                <a class="dropdown-item" href="/Deals/ActiveDates">Active Dates</a>
+                                <a class="dropdown-item" href="/Deals/Search">Search</a>
+                                <a class="dropdown-item" href="/Deals/Product">Product</a>
+                                <a class="dropdown-item" href="/Deals/Period">Period</a>
+                                <a class="dropdown-item" href="/Deals/DestinationId">Destination Id</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDeals" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Guides</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDeals">
+                                <a class="dropdown-item" href="/Guides/GetAllGuides">All Guides</a>
+                                <a class="dropdown-item" href="/Guides/GetGuideById">Guide By Id</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/swagger">Swagger</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/Trace">Trace</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        
+
+
+        <main role="main" class="pb-3">
+            
+<h1>Search</h1>
+
+<div class="row">
+    <form id="dealsSearch" method="get" action="/Deals/Search">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-lg-4">
+                    <label for="destinationCode">Destination Code</label>
+                    <input type="text" id="destinationCode" name="destinationCode" class="form-control" value="50022">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" name="startDate" class="form-control" value="2026-03-17">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" name="endDate" class="form-control" value="2026-03-25">
+                </div>
+                <div class="col-lg-4">
+                    <label for="dealType">Deal Type</label>
+                    <select id="dealType" name="dealType" class="form-control">
+                                <option value="Unknown">Unknown</option>
+                                <option selected="" value="Deal">Deal</option>
+                                <option value="Ski">Ski</option>
+                                <option value="Spa">Spa</option>
+                    </select>
+                    <label for="subj_id">Subject</label>
+                    <input type="text" id="SubjectId" name="SubjectId" class="form-control" value="0">
+                    <label for="hotelCode">Hotel Code</label>
+                    <input type="text" id="hotelCode" name="hotelCode" class="form-control">
+                </div>
+                <div class="col-lg-4">
+                    <label for="adults">Adults</label>
+                    <input type="number" id="adults" name="adults" class="form-control" value="2" min="0">
+                    <label for="children">Children</label>
+                    <input type="number" id="children" name="children" class="form-control" value="0" min="0">
+                    <label for="infants">Infants</label>
+                    <input type="number" id="infants" name="infants" class="form-control" value="0" min="0">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4">
+                    <input type="checkbox" id="isAgent" name="isAgent" class="form-check-input">
+                    <label class="form-check-label" for="isAgent">Is Agent</label>
+                </div>
+                <div class="col-lg-4">
+                    <input type="checkbox" id="isTravelListSite" name="isTravelListSite" class="form-check-input">
+                    <label class="form-check-label" for="isTravelListSite">Is Travel List</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1">
+                    <input type="submit" class="btn btn-primary">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+    <div class="card">
+        <div class="card-header">
+            <span>Token: <a target="_blank" href="/Trace?token=79595ee3-242f-4027-ae0d-b23a8708ad14">79595ee3-242f-4027-ae0d-b23a8708ad14</a></span> &nbsp;
+            <span>Time: <span class="badge">0.13</span></span>
+            <span>Deals: <span class="badge">0</span></span>
+        </div>
+        <div class="card-body">
+            
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Hotel</th>
+            <th>Deal Type</th>
+            <th>Deal Product Type</th>
+            <th>Vendor</th>
+            <th>Number Of Flights</th>
+            <th>Other</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+        </div>
+    </div>
+
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            © 2026 - Tour Gateway - Eshet-Tours IT - Integration
+        </div>
+    </footer>
+
+    
+    
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" crossorigin="anonymous" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
+        </script>
+<script>(window.jQuery||document.write("\u003Cscript src=\u0022/lib/jquery/dist/jquery.min.js\u0022 crossorigin=\u0022anonymous\u0022 integrity=\u0022sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=\u0022\u003E\u003C/script\u003E"));</script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js" crossorigin="anonymous" integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
+        </script>
+<script>(window.jQuery && window.jQuery.fn && window.jQuery.fn.modal||document.write("\u003Cscript src=\u0022/lib/bootstrap/dist/js/bootstrap.bundle.min.js\u0022 crossorigin=\u0022anonymous\u0022 integrity=\u0022sha384-xrRywqdh3PHs8keKZN\u002B8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o\u0022\u003E\u003C/script\u003E"));</script>
+    
+    <script src="/js/site.js?v=D4TFpxvZBRwxBiTkpn2L_q-zBuyBxK-Rvd7M1cA7jP4"></script>
+    <link rel="stylesheet" href="/lib/font-awesome/css/all.css">
+    
+
+
+</body></html>
