@@ -5,6 +5,13 @@ on:
     - cron: "0 * * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: hourly-closed-packages
+  cancel-in-progress: false
+
 jobs:
   run-monitoring:
     runs-on: ubuntu-latest
@@ -16,11 +23,11 @@ jobs:
       SMTP_PASS: ${{ secrets.SMTP_PASS }}
       MAIL_TO: ${{ secrets.MAIL_TO }}
       MAIL_CC: ${{ secrets.MAIL_CC }}
-      SCHEDULE_TZ: ${{ vars.SCHEDULE_TZ }}
-      SCHEDULE_DAYS: ${{ vars.SCHEDULE_DAYS }}
-      SCHEDULE_START: ${{ vars.SCHEDULE_START }}
-      SCHEDULE_END: ${{ vars.SCHEDULE_END }}
-      RUN_OUTSIDE_SCHEDULE: ${{ vars.RUN_OUTSIDE_SCHEDULE }}
+      SCHEDULE_TZ: ${{ vars.SCHEDULE_TZ || 'Asia/Jerusalem' }}
+      SCHEDULE_DAYS: ${{ vars.SCHEDULE_DAYS || 'Sun,Mon,Tue,Wed,Thu,Fri' }}
+      SCHEDULE_START: ${{ vars.SCHEDULE_START || '08:00' }}
+      SCHEDULE_END: ${{ vars.SCHEDULE_END || '17:00' }}
+      RUN_OUTSIDE_SCHEDULE: ${{ vars.RUN_OUTSIDE_SCHEDULE || 'false' }}
       HEADLESS: "true"
 
     steps:

@@ -140,13 +140,19 @@ class Settings:
 
 
 def load_settings() -> Settings:
-    smtp_port_raw = os.getenv("SMTP_PORT", "587").strip()
+    smtp_port_raw = os.getenv("SMTP_PORT", "587").strip() or "587"
     smtp_port = int(smtp_port_raw)
 
-    schedule_tz = os.getenv("SCHEDULE_TZ", "Asia/Jerusalem").strip()
-    schedule_days = parse_days(os.getenv("SCHEDULE_DAYS", "Sun,Mon,Tue,Wed,Thu,Fri"))
-    schedule_start = parse_time(os.getenv("SCHEDULE_START", "08:00"), "SCHEDULE_START")
-    schedule_end = parse_time(os.getenv("SCHEDULE_END", "17:00"), "SCHEDULE_END")
+    schedule_tz = os.getenv("SCHEDULE_TZ", "Asia/Jerusalem").strip() or "Asia/Jerusalem"
+    schedule_days_raw = (
+        os.getenv("SCHEDULE_DAYS", "Sun,Mon,Tue,Wed,Thu,Fri").strip()
+        or "Sun,Mon,Tue,Wed,Thu,Fri"
+    )
+    schedule_start_raw = os.getenv("SCHEDULE_START", "08:00").strip() or "08:00"
+    schedule_end_raw = os.getenv("SCHEDULE_END", "17:00").strip() or "17:00"
+    schedule_days = parse_days(schedule_days_raw)
+    schedule_start = parse_time(schedule_start_raw, "SCHEDULE_START")
+    schedule_end = parse_time(schedule_end_raw, "SCHEDULE_END")
 
     return Settings(
         smtp_host=os.getenv("SMTP_HOST", "").strip(),
