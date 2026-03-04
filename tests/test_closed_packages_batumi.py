@@ -125,12 +125,10 @@ def test_closed_packages_batumi(page, settings: Settings) -> None:
             "end_date": "",
             "tourgateway_url": "",
             "eshet_url": "",
-            "sabre_hotel_name": "",
-            "odyssea_hotel_name": "",
             "sabre_rows_count": 0,
             "odyssea_rows_count": 0,
-            "eshet_sabre_found": False,
-            "eshet_odyssea_found": False,
+            "sabre_results": [],
+            "odyssea_results": [],
             "attempts": attempts,
         }
         write_json(SUMMARY_PATH, failed_summary)
@@ -152,125 +150,47 @@ def test_closed_packages_batumi(page, settings: Settings) -> None:
     eshet = EshetSearchPage(page, settings)
     eshet_url = eshet.build_search_url(start_date=start_date, end_date=end_date)
 
-    sabre_found = False
-    odyssea_found = False
-    sabre_confirmed_name = ""
-    odyssea_confirmed_name = ""
-    sabre_result: dict = {
-        "found": False,
-        "package_url": "",
-        "package_id": "",
-        "detected_vendor": "Unknown",
-        "expected_vendor": SABRE_VENDOR,
-        "hotel_header": "",
-        "hotel_source": "",
-    }
-    odyssea_result: dict = {
-        "found": False,
-        "package_url": "",
-        "package_id": "",
-        "detected_vendor": "Unknown",
-        "expected_vendor": ODYSSEA_VENDOR,
-        "hotel_header": "",
-        "hotel_source": "",
-    }
-    sabre_checked: list[str] = []
-    odyssea_checked: list[str] = []
-    eshet_errors: list[str] = []
+    sabre_candidates = list(dict.fromkeys(
+        selected.get("sabre_hotel_candidates") or [selected["sabre_hotel_name"]]
+    ))
+    odyssea_candidates = list(dict.fromkeys(
+        selected.get("odyssea_hotel_candidates") or [selected["odyssea_hotel_name"]]
+    ))
 
-    sabre_candidates = list(dict.fromkeys(selected.get("sabre_hotel_candidates") or [selected["sabre_hotel_name"]]))[:5]
-    odyssea_candidates = list(dict.fromkeys(selected.get("odyssea_hotel_candidates") or [selected["odyssea_hotel_name"]]))[:5]
+    sabre_results: list[dict] = []
+    odyssea_results: list[dict] = []
 
-    with allure.step("אימות הגעה באתר אשת"):
-        with allure.step("אימות מלון ראשון"):
-            for candidate in sabre_candidates:
-                if not candidate.strip():
-                    continue
-                sabre_checked.append(candidate)
-                try:
-                    result = eshet.confirm_hotel_arrival(
-                        eshet_url=eshet_url,
-                        hotel_name=candidate,
-                        expected_vendor=SABRE_VENDOR,
-                    )
-                    sabre_result = result if isinstance(result, dict) else {"found": bool(result)}
-                    sabre_found = bool(sabre_result.get("found"))
-                except Exception as exc:
-                    sabre_found = False
-                    sabre_result = {
-                        "found": False,
-                        "package_url": "",
-                        "package_id": "",
-                        "detected_vendor": "Unknown",
-                        "expected_vendor": SABRE_VENDOR,
-                        "hotel_header": "",
-                        "hotel_source": "error",
-                    }
-                    eshet_errors.append(f"sabre_error: {exc}")
-                    allure.attach(
-                        str(exc),
-                        name="eshet_sabre_error.txt",
-                        attachment_type=allure.attachment_type.TEXT,
-                    )
-                if sabre_found:
-                    sabre_confirmed_name = candidate
-                    break
+    with allure.step("אימות כל החבילות באתר אשת"):
+        with allure.step(f"אימות {len(sabre_candidates)} מלונות SabreLDS"):
+            sabre_results = eshet.confirm_all_hotels(
+                eshet_url=eshet_url,
+                hotel_candidates=sabre_candidates,
+                expected_vendor=SABRE_VENDOR,
+            )
             allure.attach(
-                json.dumps(sabre_result, ensure_ascii=False, indent=2),
-                name="eshet_sabre_result.json",
+                json.dumps(sabre_results, ensure_ascii=False, indent=2),
+                name="eshet_sabre_all_results.json",
                 attachment_type=allure.attachment_type.JSON,
             )
-            allure.attach(
-                "נמצא" if sabre_found else "לא נמצא",
-                name="eshet_sabre_status.txt",
-                attachment_type=allure.attachment_type.TEXT,
-            )
 
-        with allure.step("אימות מלון שני"):
-            for candidate in odyssea_candidates:
-                if not candidate.strip():
-                    continue
-                odyssea_checked.append(candidate)
-                try:
-                    result = eshet.confirm_hotel_arrival(
-                        eshet_url=eshet_url,
-                        hotel_name=candidate,
-                        expected_vendor=ODYSSEA_VENDOR,
-                    )
-                    odyssea_result = result if isinstance(result, dict) else {"found": bool(result)}
-                    odyssea_found = bool(odyssea_result.get("found"))
-                except Exception as exc:
-                    odyssea_found = False
-                    odyssea_result = {
-                        "found": False,
-                        "package_url": "",
-                        "package_id": "",
-                        "detected_vendor": "Unknown",
-                        "expected_vendor": ODYSSEA_VENDOR,
-                        "hotel_header": "",
-                        "hotel_source": "error",
-                    }
-                    eshet_errors.append(f"odyssea_error: {exc}")
-                    allure.attach(
-                        str(exc),
-                        name="eshet_odyssea_error.txt",
-                        attachment_type=allure.attachment_type.TEXT,
-                    )
-                if odyssea_found:
-                    odyssea_confirmed_name = candidate
-                    break
+        with allure.step(f"אימות {len(odyssea_candidates)} מלונות Odyssea"):
+            odyssea_results = eshet.confirm_all_hotels(
+                eshet_url=eshet_url,
+                hotel_candidates=odyssea_candidates,
+                expected_vendor=ODYSSEA_VENDOR,
+            )
             allure.attach(
-                json.dumps(odyssea_result, ensure_ascii=False, indent=2),
-                name="eshet_odyssea_result.json",
+                json.dumps(odyssea_results, ensure_ascii=False, indent=2),
+                name="eshet_odyssea_all_results.json",
                 attachment_type=allure.attachment_type.JSON,
             )
-            allure.attach(
-                "נמצא" if odyssea_found else "לא נמצא",
-                name="eshet_odyssea_status.txt",
-                attachment_type=allure.attachment_type.TEXT,
-            )
 
-    status = "passed" if sabre_found and odyssea_found else "failed"
+    sabre_found_count = sum(1 for r in sabre_results if r.get("found"))
+    odyssea_found_count = sum(1 for r in odyssea_results if r.get("found"))
+    sabre_total = len(sabre_results)
+    odyssea_total = len(odyssea_results)
+    all_found = sabre_found_count == sabre_total and odyssea_found_count == odyssea_total
+    status = "passed" if all_found else "failed"
 
     final_summary = {
         "status": status,
@@ -279,39 +199,35 @@ def test_closed_packages_batumi(page, settings: Settings) -> None:
         "end_date": selected["end_date"],
         "tourgateway_url": selected["tourgateway_url"],
         "eshet_url": eshet_url,
-        "sabre_hotel_name": sabre_confirmed_name or selected["sabre_hotel_name"],
-        "odyssea_hotel_name": odyssea_confirmed_name or selected["odyssea_hotel_name"],
-        "sabre_hotel_name_source": selected["sabre_hotel_name"],
-        "odyssea_hotel_name_source": selected["odyssea_hotel_name"],
-        "sabre_checked_hotels": sabre_checked,
-        "odyssea_checked_hotels": odyssea_checked,
         "sabre_rows_count": selected["sabre_rows_count"],
         "odyssea_rows_count": selected["odyssea_rows_count"],
-        "eshet_sabre_found": sabre_found,
-        "eshet_odyssea_found": odyssea_found,
-        "sabre_package_url": sabre_result.get("package_url", ""),
-        "sabre_package_id": sabre_result.get("package_id", ""),
-        "sabre_detected_vendor": sabre_result.get("detected_vendor", "Unknown"),
-        "sabre_expected_vendor": SABRE_VENDOR,
-        "sabre_hotel_source_type": sabre_result.get("hotel_source", ""),
-        "odyssea_package_url": odyssea_result.get("package_url", ""),
-        "odyssea_package_id": odyssea_result.get("package_id", ""),
-        "odyssea_detected_vendor": odyssea_result.get("detected_vendor", "Unknown"),
-        "odyssea_expected_vendor": ODYSSEA_VENDOR,
-        "odyssea_hotel_source_type": odyssea_result.get("hotel_source", ""),
-        "eshet_errors": eshet_errors,
+        "sabre_found_count": sabre_found_count,
+        "sabre_total_count": sabre_total,
+        "odyssea_found_count": odyssea_found_count,
+        "odyssea_total_count": odyssea_total,
+        "sabre_results": sabre_results,
+        "odyssea_results": odyssea_results,
         "attempts": attempts,
     }
 
     write_json(SUMMARY_PATH, final_summary)
     allure.attach(
         json.dumps(final_summary, ensure_ascii=False, indent=2),
-        name="summary_selected_window.json",
+        name="summary_all_packages.json",
         attachment_type=allure.attachment_type.JSON,
     )
 
-    if not sabre_found or not odyssea_found:
-        pytest.fail("На Эшет подтвержден не полный набор отелей")
-
-    assert selected["sabre_hotel_name"], f"Не найден отель для {SABRE_VENDOR}"
-    assert selected["odyssea_hotel_name"], f"Не найден отель для {ODYSSEA_VENDOR}"
+    if not all_found:
+        missing: list[str] = []
+        for r in sabre_results:
+            if not r.get("found"):
+                missing.append(f"SabreLDS: {r.get('hotel_name', '?')}")
+        for r in odyssea_results:
+            if not r.get("found"):
+                missing.append(f"Odyssea: {r.get('hotel_name', '?')}")
+        pytest.fail(
+            f"Не все пакеты найдены на Эшет. "
+            f"SabreLDS: {sabre_found_count}/{sabre_total}, "
+            f"Odyssea: {odyssea_found_count}/{odyssea_total}. "
+            f"Не найдены: {', '.join(missing)}"
+        )

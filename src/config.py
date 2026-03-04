@@ -167,7 +167,7 @@ def load_settings() -> Settings:
         schedule_end=schedule_end,
         run_outside_schedule=parse_bool(os.getenv("RUN_OUTSIDE_SCHEDULE", "false"), default=False),
         headless=parse_bool(os.getenv("HEADLESS", "true"), default=True),
-        eshet_results_wait_ms=12_000,
-        eshet_scroll_wait_ms=2_000,
-        eshet_max_scrolls=8,
+        eshet_results_wait_ms=5_000,
+        eshet_scroll_wait_ms=1_000,
+        eshet_max_scrolls=3,
     )

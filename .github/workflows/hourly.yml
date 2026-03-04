@@ -1,15 +1,20 @@
-name: hourly-closed-packages
+name: daily-closed-packages
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    # 07:00 UTC = 09:00 Israel winter (IST), 10:00 Israel summer (IDT)
+    # 06:00 UTC = 08:00 Israel winter (IST), 09:00 Israel summer (IDT)
+    - cron: "0 6 * * *"
+    - cron: "0 7 * * *"
   workflow_dispatch:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: hourly-closed-packages
+  group: daily-closed-packages
   cancel-in-progress: false
 
 jobs:
@@ -25,8 +30,8 @@ jobs:
       MAIL_CC: ${{ secrets.MAIL_CC }}
       SCHEDULE_TZ: ${{ vars.SCHEDULE_TZ || 'Asia/Jerusalem' }}
       SCHEDULE_DAYS: ${{ vars.SCHEDULE_DAYS || 'Sun,Mon,Tue,Wed,Thu,Fri' }}
-      SCHEDULE_START: ${{ vars.SCHEDULE_START || '08:00' }}
-      SCHEDULE_END: ${{ vars.SCHEDULE_END || '17:00' }}
+      SCHEDULE_START: "09:00"
+      SCHEDULE_END: "09:30"
       RUN_OUTSIDE_SCHEDULE: ${{ vars.RUN_OUTSIDE_SCHEDULE || 'false' }}
       HEADLESS: "true"
 
@@ -53,13 +58,9 @@ jobs:
       - name: Run CI script
         run: python scripts/run_ci.py
 
-      - name: Upload Allure ZIP
+      - name: Generate Allure report
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-report-zip
-          path: artifacts/allure-report.zip
-          if-no-files-found: ignore
+        run: allure generate allure-results -o allure-report --clean
 
       - name: Upload Allure results
         if: always()
@@ -76,3 +77,27 @@ jobs:
           name: summary-json
           path: artifacts/summary.json
           if-no-files-found: ignore
+
+      - name: Upload Pages artifact
+        if: always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+
+  deploy-report:
+    needs: run-monitoring
+    if: always()
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

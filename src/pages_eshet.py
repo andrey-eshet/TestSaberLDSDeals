@@ -35,12 +35,10 @@ class EshetSearchPage:
         return f"{ESHET_BASE_URL}?{urlencode(params)}"
 
     def open_results(self, url: str) -> None:
-        self.page.goto(url, wait_until="domcontentloaded", timeout=120_000)
+        self.page.goto(url, wait_until="domcontentloaded", timeout=60_000)
         try:
-            self.page.wait_for_load_state("networkidle", timeout=15_000)
+            self.page.wait_for_load_state("networkidle", timeout=8_000)
         except PlaywrightTimeoutError:
-            # Eshet often keeps background network activity.
-            # We continue with fixed wait according to test requirement.
             pass
         self.page.wait_for_timeout(self.settings.eshet_results_wait_ms)
 
@@ -159,7 +157,7 @@ class EshetSearchPage:
         expected_vendor: str,
     ) -> dict | None:
         api_url = self._deals_api_url_from_search_url(eshet_url)
-        response = self.page.request.get(api_url, timeout=120_000)
+        response = self.page.request.get(api_url, timeout=60_000)
         if response.status != 200:
             return None
 
@@ -204,7 +202,7 @@ class EshetSearchPage:
         package_id = (parse_qs(parsed_url.query).get("packageid") or [""])[0]
         detected_vendor = self._classify_vendor_by_package_id(package_id)
 
-        self.page.goto(package_url, wait_until="domcontentloaded", timeout=120_000)
+        self.page.goto(package_url, wait_until="domcontentloaded", timeout=60_000)
         self.page.wait_for_timeout(2_000)
 
         h1 = self.page.locator("h1")
@@ -258,15 +256,15 @@ class EshetSearchPage:
         )
 
         if preferred_click.count() > 0:
-            preferred_click.first.click(timeout=20_000)
+            preferred_click.first.click(timeout=10_000)
             return
 
         any_clickable = card.locator("a, button, h1, h2, h3, [role='link']")
         if any_clickable.count() > 0:
-            any_clickable.first.click(timeout=20_000)
+            any_clickable.first.click(timeout=10_000)
             return
 
-        card.click(timeout=20_000)
+        card.click(timeout=10_000)
 
     def _find_hotel_in_schema(self, hotel_name: str) -> dict | None:
         return self.page.evaluate(
@@ -327,7 +325,7 @@ class EshetSearchPage:
         if not schema_item or not schema_item.get("url"):
             return False
 
-        self.page.goto(str(schema_item["url"]), wait_until="domcontentloaded", timeout=120_000)
+        self.page.goto(str(schema_item["url"]), wait_until="domcontentloaded", timeout=60_000)
         self.page.wait_for_timeout(2_000)
 
         h1 = self.page.locator("h1")
@@ -358,6 +356,93 @@ class EshetSearchPage:
             return True
 
         return False
+
+    def fetch_all_deals(self, eshet_url: str) -> dict | None:
+        """Fetch all deals from the Eshet API once and return the raw dictionary."""
+        api_url = self._deals_api_url_from_search_url(eshet_url)
+        try:
+            response = self.page.request.get(api_url, timeout=60_000)
+            if response.status != 200:
+                return None
+            payload = response.json()
+            deals = payload.get("dealsDictionary") or {}
+            return deals if isinstance(deals, dict) else None
+        except Exception:
+            return None
+
+    def confirm_all_hotels(
+        self,
+        eshet_url: str,
+        hotel_candidates: list[str],
+        expected_vendor: str,
+    ) -> list[dict]:
+        """Verify ALL hotel candidates against Eshet. Returns a result dict per candidate."""
+        self.open_results(eshet_url)
+        allure.attach(
+            self.page.screenshot(full_page=True),
+            name=f"eshet_results_{expected_vendor}.png",
+            attachment_type=allure.attachment_type.PNG,
+        )
+
+        deals = self.fetch_all_deals(eshet_url)
+        results: list[dict] = []
+
+        for hotel_name in hotel_candidates:
+            hotel_name = clean_hotel_name(hotel_name)
+            if not hotel_name.strip():
+                continue
+
+            package_data = None
+            if deals:
+                for deal in deals.values():
+                    if not isinstance(deal, dict):
+                        continue
+                    deal_name = clean_hotel_name(str(deal.get("Name") or ""))
+                    if not self._match_hotel_name(hotel_name, deal_name):
+                        continue
+                    built = self._build_package_url_from_deal(deal)
+                    if built and built.get("detected_vendor") == expected_vendor:
+                        package_data = built
+                        break
+                    if built and package_data is None:
+                        package_data = built
+
+            if package_data:
+                try:
+                    result = self._validate_package_url(
+                        package_url=str(package_data["url"]),
+                        hotel_name=hotel_name,
+                        expected_vendor=expected_vendor,
+                        source="api_batch",
+                        package_name_hint=str(package_data.get("hotel_name") or ""),
+                    )
+                except Exception as exc:
+                    result = {
+                        "found": False,
+                        "hotel_name": hotel_name,
+                        "package_url": str(package_data.get("url", "")),
+                        "package_id": str(package_data.get("package_id", "")),
+                        "detected_vendor": str(package_data.get("detected_vendor", "Unknown")),
+                        "expected_vendor": expected_vendor,
+                        "hotel_header": "",
+                        "hotel_source": "error",
+                        "error": str(exc),
+                    }
+                result["hotel_name"] = hotel_name
+                results.append(result)
+            else:
+                results.append({
+                    "found": False,
+                    "hotel_name": hotel_name,
+                    "package_url": "",
+                    "package_id": "",
+                    "detected_vendor": "Unknown",
+                    "expected_vendor": expected_vendor,
+                    "hotel_header": "",
+                    "hotel_source": "not_found_in_api",
+                })
+
+        return results
 
     def confirm_hotel_arrival(self, eshet_url: str, hotel_name: str, expected_vendor: str) -> dict:
         hotel_name = clean_hotel_name(hotel_name)
@@ -411,7 +496,7 @@ class EshetSearchPage:
             card = self._find_visible_card(hotel_name)
             if card is not None:
                 self._click_card(card, hotel_name)
-                self.page.wait_for_load_state("domcontentloaded", timeout=120_000)
+                self.page.wait_for_load_state("domcontentloaded", timeout=60_000)
                 self.page.wait_for_timeout(2_000)
                 if "/deals/dealdetails/" in self.page.url.lower():
                     return self._validate_package_url(

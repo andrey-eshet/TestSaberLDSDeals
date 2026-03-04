@@ -29,11 +29,11 @@ class TourGatewayPage:
     def open_and_collect(self, start_date: date, end_date: date) -> dict[str, Any]:
         url = self.build_search_url(start_date, end_date)
 
-        self.page.goto(url, wait_until="domcontentloaded", timeout=120_000)
-        self.page.wait_for_load_state("networkidle", timeout=120_000)
+        self.page.goto(url, wait_until="domcontentloaded", timeout=60_000)
+        self.page.wait_for_load_state("networkidle", timeout=60_000)
 
         try:
-            self.page.wait_for_selector("table tbody", state="attached", timeout=60_000)
+            self.page.wait_for_selector("table tbody", state="attached", timeout=30_000)
         except PlaywrightTimeoutError as exc:
             raise AssertionError("Не найдена таблица результатов TourGW") from exc
 

@@ -18,13 +18,10 @@ from src.utils import (
     now_in_tz,
     read_json,
     run_command,
-    zip_directory,
 )
 
 ALLURE_RESULTS_DIR = ROOT / "allure-results"
 ALLURE_REPORT_DIR = ROOT / "allure-report"
-ALLURE_ZIP = ROOT / "artifacts" / "allure-report.zip"
-ALLURE_RESULTS_ZIP = ROOT / "artifacts" / "allure-results.zip"
 SUMMARY_PATH = ROOT / "artifacts" / "summary.json"
 MAIL_SCREENSHOT_DIR = ROOT / "artifacts" / "mail"
 
@@ -117,15 +114,10 @@ def main() -> int:
         print("Allure CLI not found. Report generation skipped.")
         report_code = 127
 
-    if report_code == 0:
-        zip_directory(ALLURE_REPORT_DIR, ALLURE_ZIP)
-    else:
+    if report_code != 0:
         if ALLURE_REPORT_DIR.exists():
             shutil.rmtree(ALLURE_REPORT_DIR, ignore_errors=True)
-        if ALLURE_ZIP.exists():
-            ALLURE_ZIP.unlink()
-        print("Allure report generation failed. allure-report.zip was skipped.")
-    zip_directory(ALLURE_RESULTS_DIR, ALLURE_RESULTS_ZIP)
+        print("Allure report generation failed.")
 
     summary = read_json(SUMMARY_PATH)
     if not summary:

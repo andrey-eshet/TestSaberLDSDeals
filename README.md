@@ -23,7 +23,7 @@ repo/
   README.md
   requirements.txt
   pytest.ini
-  .env.example
+  .env
   src/
     config.py
     schedule.py
@@ -45,10 +45,22 @@ repo/
 
 ## Подготовка локально
 
+### PowerShell (Windows)
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python -m playwright install chromium
+```
+
+### Bash (Linux / macOS / Git Bash)
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m playwright install chromium
 ```
@@ -59,29 +71,66 @@ python -m playwright install chromium
 npm install -g allure-commandline
 ```
 
-Создайте файл окружения:
+Создайте или обновите файл `.env`.
 
-```bash
-cp .env.example .env
+Минимально для локального запуска:
+
+```env
+HEADLESS=true
 ```
 
-## Локальный запуск
+## Команды проекта
 
-```bash
+Все команды ниже выполняются из корня проекта.
+
+### Запуск теста напрямую через pytest
+
+Обычный запуск:
+
+```powershell
+python -m pytest -s -vv tests/test_closed_packages_batumi.py
+```
+
+Запуск с видимым браузером:
+
+```powershell
+$env:HEADLESS="false"
+python -m pytest -s -vv tests/test_closed_packages_batumi.py
+```
+
+Одной строкой:
+
+```powershell
+$env:HEADLESS="false"; python -m pytest -s -vv tests/test_closed_packages_batumi.py
+```
+
+Явно записать результаты для Allure:
+
+```powershell
+python -m pytest -s -vv --alluredir=allure-results tests/test_closed_packages_batumi.py
+```
+
+### Локальный запуск полным скриптом
+
+```powershell
 python scripts/run_local.py
+```
+
+С видимым браузером:
+
+```powershell
+$env:HEADLESS="false"; python scripts/run_local.py
 ```
 
 Скрипт:
 1. Запускает `pytest`.
 2. Генерирует `allure-report`.
-3. Создает `artifacts/allure-report.zip`.
-4. Отправляет HTML письмо, если SMTP переменные заполнены.
-5. В письмо добавляются ссылки и inline скриншоты.
-6. ZIP отчеты в письмо не отправляются.
+3. Отправляет HTML письмо, если SMTP переменные заполнены.
+4. В письмо добавляются ссылки и inline скриншоты.
 
-## CI запуск с учетом рабочего окна
+### CI запуск с учетом рабочего окна
 
-```bash
+```powershell
 python scripts/run_ci.py
 ```
 
@@ -90,6 +139,40 @@ python scripts/run_ci.py
 - Вне окна:
 - при `RUN_OUTSIDE_SCHEDULE=false` завершает работу с `exit 0` без тестов и без письма.
 - при `RUN_OUTSIDE_SCHEDULE=true` запускает тесты, но письмо не отправляет.
+
+### Allure
+
+Сгенерировать отчет из существующих результатов:
+
+```powershell
+allure generate allure-results -o allure-report --clean
+```
+
+Открыть уже сгенерированный отчет:
+
+```powershell
+allure open allure-report
+```
+
+Сгенерировать и сразу открыть временный отчет:
+
+```powershell
+allure serve allure-results
+```
+
+### Полезные команды
+
+Запустить все тесты:
+
+```powershell
+python -m pytest
+```
+
+Запустить все тесты с видимым браузером:
+
+```powershell
+$env:HEADLESS="false"; python -m pytest
+```
 
 ## Переменные окружения
 
