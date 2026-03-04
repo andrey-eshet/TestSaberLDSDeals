@@ -85,8 +85,8 @@ def _send_with_fallback(
         raise last_exc
 
 
-def _send_mail(settings, decision) -> None:
-    if not decision.should_send_mail:
+def _send_mail(settings, decision, force: bool = False) -> None:
+    if not force and not decision.should_send_mail:
         print("Mail sending disabled by schedule decision.")
         return
 
@@ -122,7 +122,7 @@ def main() -> int:
     print(f"Schedule decision: {decision.reason}")
 
     if email_only:
-        _send_mail(settings, decision)
+        _send_mail(settings, decision, force=True)
         return 0
 
     if not decision.should_run_tests:
