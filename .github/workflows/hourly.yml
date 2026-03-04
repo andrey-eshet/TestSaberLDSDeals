@@ -32,7 +32,7 @@ jobs:
       SCHEDULE_DAYS: ${{ vars.SCHEDULE_DAYS || 'Sun,Mon,Tue,Wed,Thu,Fri' }}
       SCHEDULE_START: "09:00"
       SCHEDULE_END: "09:30"
-      RUN_OUTSIDE_SCHEDULE: ${{ vars.RUN_OUTSIDE_SCHEDULE || 'false' }}
+      RUN_OUTSIDE_SCHEDULE: ${{ github.event_name == 'workflow_dispatch' && 'true' || vars.RUN_OUTSIDE_SCHEDULE || 'false' }}
       HEADLESS: "true"
 
     steps:
