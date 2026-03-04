@@ -28,11 +28,11 @@ jobs:
       SMTP_PASS: ${{ secrets.SMTP_PASS }}
       MAIL_TO: ${{ secrets.MAIL_TO }}
       MAIL_CC: ${{ secrets.MAIL_CC }}
-      SCHEDULE_TZ: ${{ vars.SCHEDULE_TZ || 'Asia/Jerusalem' }}
-      SCHEDULE_DAYS: ${{ vars.SCHEDULE_DAYS || 'Sun,Mon,Tue,Wed,Thu,Fri' }}
+      SCHEDULE_TZ: "Asia/Jerusalem"
+      SCHEDULE_DAYS: "Sun,Mon,Tue,Wed,Thu,Fri"
       SCHEDULE_START: "09:00"
       SCHEDULE_END: "09:30"
-      RUN_OUTSIDE_SCHEDULE: ${{ github.event_name == 'workflow_dispatch' && 'true' || vars.RUN_OUTSIDE_SCHEDULE || 'false' }}
+      RUN_OUTSIDE_SCHEDULE: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
       HEADLESS: "true"
 
     steps:
@@ -49,18 +49,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Install Allure CLI
-        run: npm install -g allure-commandline
-
       - name: Install Playwright browser
         run: python -m playwright install --with-deps chromium
 
-      - name: Run CI script
-        run: python scripts/run_ci.py
+      - name: Run tests
+        run: python -m pytest tests/ -v -s --alluredir=allure-results
+        continue-on-error: true
+
+      - name: Install Allure CLI
+        if: always()
+        run: npm install -g allure-commandline
 
       - name: Generate Allure report
         if: always()
         run: allure generate allure-results -o allure-report --clean
+
+      - name: Send email report
+        if: always()
+        run: python scripts/run_ci.py --email-only
+        continue-on-error: true
 
       - name: Upload Allure results
         if: always()

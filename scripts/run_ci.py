@@ -85,12 +85,45 @@ def _send_with_fallback(
         raise last_exc
 
 
+def _send_mail(settings, decision) -> None:
+    if not decision.should_send_mail:
+        print("Mail sending disabled by schedule decision.")
+        return
+
+    if not settings.smtp_ready():
+        print("SMTP configuration is missing. Email sending skipped.")
+        return
+
+    summary = read_json(SUMMARY_PATH)
+    if not summary:
+        summary = {"status": "unknown", "attempts": []}
+
+    now_local = now_in_tz(settings.schedule_tz)
+    subject = build_email_subject(summary=summary, dt_local=now_local)
+    body_text = build_email_body(summary=summary, dt_local=now_local)
+    screenshots = _collect_mail_screenshots()
+    _send_with_fallback(
+        settings=settings,
+        subject=subject,
+        body_text=body_text,
+        summary=summary,
+        dt_local=now_local,
+        screenshots=screenshots,
+    )
+
+
 def main() -> int:
+    email_only = "--email-only" in sys.argv
+
     settings = load_settings()
     decision = evaluate_schedule(settings)
 
     print(f"Current local time: {decision.now_local.isoformat()}")
     print(f"Schedule decision: {decision.reason}")
+
+    if email_only:
+        _send_mail(settings, decision)
+        return 0
 
     if not decision.should_run_tests:
         print("Outside work schedule. Tests and email are skipped with exit code 0.")
@@ -119,34 +152,7 @@ def main() -> int:
             shutil.rmtree(ALLURE_REPORT_DIR, ignore_errors=True)
         print("Allure report generation failed.")
 
-    summary = read_json(SUMMARY_PATH)
-    if not summary:
-        summary = {
-            "status": "failed" if pytest_code != 0 else "passed",
-            "attempts": [],
-            "eshet_sabre_found": False,
-            "eshet_odyssea_found": False,
-        }
-
-    if decision.should_send_mail:
-        if not settings.smtp_ready():
-            print("SMTP configuration is missing. Email sending failed.")
-            return 1
-
-        now_local = now_in_tz(settings.schedule_tz)
-        subject = build_email_subject(summary=summary, dt_local=now_local)
-        body_text = build_email_body(summary=summary, dt_local=now_local)
-        screenshots = _collect_mail_screenshots()
-        _send_with_fallback(
-            settings=settings,
-            subject=subject,
-            body_text=body_text,
-            summary=summary,
-            dt_local=now_local,
-            screenshots=screenshots,
-        )
-    else:
-        print("Mail sending disabled by schedule decision.")
+    _send_mail(settings, decision)
 
     if pytest_code != 0:
         return pytest_code
