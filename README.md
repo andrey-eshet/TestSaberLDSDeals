@@ -1,22 +1,26 @@
 # autoTestEshet
 
-Репозиторий автотеста для мониторинга закрытых пакетов по направлению Батуми.
+מאגר של בדיקות אוטומטיות לניטור חבילות סגורות ליעד באטומי.
 
-Стек:
-- Python
-- Playwright
-- pytest
-- Allure
+מחסנית הטכנולוגיות:
 
-Что проверяется:
-1. В TourGW находится окно дат, где есть закрытые пакеты от двух поставщиков.
-2. Поставщики в источнике истины:
-- SabreLDS
-- Odyssea
-3. Из TourGW выбирается по одному отелю от каждого поставщика.
-4. На Эшет подтверждается приход двух выбранных отелей по названию.
+* Python
+* Playwright
+* pytest
+* Allure
 
-## Структура
+מה נבדק:
+
+1. ב־TourGW נמצא חלון תאריכים שבו קיימות חבילות סגורות משני ספקים.
+2. הספקים במקור האמת:
+
+* SabreLDS
+* Odyssea
+
+3. מתוך TourGW נבחר מלון אחד מכל ספק.
+4. ב־Eshet מאומתת הגעתם של שני המלונות שנבחרו לפי השם.
+
+## מבנה
 
 ```text
 repo/
@@ -43,7 +47,7 @@ repo/
       hourly.yml
 ```
 
-## Подготовка локально
+## הכנה מקומית
 
 ### PowerShell (Windows)
 
@@ -65,151 +69,159 @@ pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-Установите Allure CLI отдельно:
+יש להתקין את Allure CLI בנפרד:
 
 ```bash
 npm install -g allure-commandline
 ```
 
-Создайте или обновите файл `.env`.
+צרו או עדכנו את קובץ ה־`.env`.
 
-Минимально для локального запуска:
+המינימום הנדרש להרצה מקומית:
 
 ```env
 HEADLESS=true
 ```
 
-## Команды проекта
+## פקודות הפרויקט
 
-Все команды ниже выполняются из корня проекта.
+כל הפקודות שלהלן מבוצעות מתוך תיקיית השורש של הפרויקט.
 
-### Запуск теста напрямую через pytest
+### הרצת הבדיקה ישירות דרך pytest
 
-Обычный запуск:
+הרצה רגילה:
 
 ```powershell
 python -m pytest -s -vv tests/test_closed_packages_batumi.py
 ```
 
-Запуск с видимым браузером:
+הרצה עם דפדפן גלוי:
 
 ```powershell
 $env:HEADLESS="false"
 python -m pytest -s -vv tests/test_closed_packages_batumi.py
 ```
 
-Одной строкой:
+בשורה אחת:
 
 ```powershell
 $env:HEADLESS="false"; python -m pytest -s -vv tests/test_closed_packages_batumi.py
 ```
 
-Явно записать результаты для Allure:
+שמירה מפורשת של התוצאות עבור Allure:
 
 ```powershell
 python -m pytest -s -vv --alluredir=allure-results tests/test_closed_packages_batumi.py
 ```
 
-### Локальный запуск полным скриптом
+### הרצה מקומית באמצעות סקריפט מלא
 
 ```powershell
 python scripts/run_local.py
 ```
 
-С видимым браузером:
+עם דפדפן גלוי:
 
 ```powershell
 $env:HEADLESS="false"; python scripts/run_local.py
 ```
 
-Скрипт:
-1. Запускает `pytest`.
-2. Генерирует `allure-report`.
-3. Отправляет HTML письмо, если SMTP переменные заполнены.
-4. В письмо добавляются ссылки и inline скриншоты.
+הסקריפט:
 
-### CI запуск с учетом рабочего окна
+1. מריץ את `pytest`.
+2. מייצר את `allure-report`.
+3. שולח מייל HTML, אם משתני ה־SMTP מולאו.
+4. למייל מתווספים קישורים וצילומי מסך מוטמעים.
+
+### הרצת CI בהתאם לחלון העבודה
 
 ```powershell
 python scripts/run_ci.py
 ```
 
-Поведение:
-- Внутри рабочего окна запускает тесты и отправляет письмо.
-- Вне окна:
-- при `RUN_OUTSIDE_SCHEDULE=false` завершает работу с `exit 0` без тестов и без письма.
-- при `RUN_OUTSIDE_SCHEDULE=true` запускает тесты, но письмо не отправляет.
+התנהגות:
+
+* בתוך חלון העבודה מריץ את הבדיקות ושולח מייל.
+* מחוץ לחלון:
+* כאשר `RUN_OUTSIDE_SCHEDULE=false` התהליך מסתיים עם `exit 0` ללא בדיקות וללא מייל.
+* כאשר `RUN_OUTSIDE_SCHEDULE=true` הבדיקות מורצות, אך מייל לא נשלח.
 
 ### Allure
 
-Сгенерировать отчет из существующих результатов:
+יצירת דוח מתוך תוצאות קיימות:
 
 ```powershell
 allure generate allure-results -o allure-report --clean
 ```
 
-Открыть уже сгенерированный отчет:
+פתיחת דוח שכבר נוצר:
 
 ```powershell
 allure open allure-report
 ```
 
-Сгенерировать и сразу открыть временный отчет:
+יצירה ופתיחה מיידית של דוח זמני:
 
 ```powershell
 allure serve allure-results
 ```
 
-### Полезные команды
+### פקודות שימושיות
 
-Запустить все тесты:
+להריץ את כל הבדיקות:
 
 ```powershell
 python -m pytest
 ```
 
-Запустить все тесты с видимым браузером:
+להריץ את כל הבדיקות עם דפדפן גלוי:
 
 ```powershell
 $env:HEADLESS="false"; python -m pytest
 ```
 
-## Переменные окружения
+## משתני סביבה
 
-Обязательные для отправки письма:
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_USER`
-- `SMTP_PASS`
-- `MAIL_TO`
+נדרשים לשליחת מייל:
 
-Опциональные:
-- `MAIL_CC`
-- `SCHEDULE_TZ` (по умолчанию `Asia/Jerusalem`)
-- `SCHEDULE_DAYS` (по умолчанию `Sun,Mon,Tue,Wed,Thu,Fri`)
-- `SCHEDULE_START` (по умолчанию `08:00`)
-- `SCHEDULE_END` (по умолчанию `17:00`)
-- `RUN_OUTSIDE_SCHEDULE` (по умолчанию `false`)
-- `HEADLESS` (по умолчанию `true`)
+* `SMTP_HOST`
+* `SMTP_PORT`
+* `SMTP_USER`
+* `SMTP_PASS`
+* `MAIL_TO`
+
+אופציונליים:
+
+* `MAIL_CC`
+* `SCHEDULE_TZ` (ברירת מחדל: `Asia/Jerusalem`)
+* `SCHEDULE_DAYS` (ברירת מחדל: `Sun,Mon,Tue,Wed,Thu,Fri`)
+* `SCHEDULE_START` (ברירת מחדל: `08:00`)
+* `SCHEDULE_END` (ברירת מחדל: `17:00`)
+* `RUN_OUTSIDE_SCHEDULE` (ברירת מחדל: `false`)
+* `HEADLESS` (ברירת מחדל: `true`)
 
 ## GitHub Actions
 
 Workflow: `.github/workflows/hourly.yml`
 
 Cron:
-- каждый час, по UTC.
 
-Секреты в GitHub:
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_USER`
-- `SMTP_PASS`
-- `MAIL_TO`
-- `MAIL_CC`
+* בכל שעה, לפי UTC.
+
+סודות ב־GitHub:
+
+* `SMTP_HOST`
+* `SMTP_PORT`
+* `SMTP_USER`
+* `SMTP_PASS`
+* `MAIL_TO`
+* `MAIL_CC`
 
 GitHub Variables:
-- `SCHEDULE_TZ`
-- `SCHEDULE_DAYS`
-- `SCHEDULE_START`
-- `SCHEDULE_END`
-- `RUN_OUTSIDE_SCHEDULE`
+
+* `SCHEDULE_TZ`
+* `SCHEDULE_DAYS`
+* `SCHEDULE_START`
+* `SCHEDULE_END`
+* `RUN_OUTSIDE_SCHEDULE`
+ 
